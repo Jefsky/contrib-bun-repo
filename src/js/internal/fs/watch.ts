@@ -46,10 +46,9 @@ class FSWatcher extends EventEmitter {
       });
       return;
     } else if (eventType === "error") {
-      // TODO: Next.js/watchpack causes this to emits weird EACCES errors on
-      // paths that shouldn't be watched. A better solution is to figure out why
-      // these paths get watched in the first place. For now we will rewrite the
-      // .code, which will cause their code path to ignore the error.
+      // Next.js/watchpack ends up watching paths it does not have access to,
+      // which surfaces here as EACCES errors. Rewriting the code to EPERM
+      // makes watchpack's error handling ignore the error instead of failing.
       if (filenameOrError.code === "EACCES") filenameOrError.code = "EPERM";
 
       this.emit(eventType, filenameOrError);
